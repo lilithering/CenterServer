@@ -1,0 +1,11 @@
+{
+  "name": "centerserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "CenterServer.js",
+  "scripts": {
+    "start": "node Server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
