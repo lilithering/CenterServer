@@ -1,27 +1,25 @@
-const { cerr, cinfo } = require("./../LogManagement/LogManagement");
-const { SBMAServerBase } = require("./MServerBase");
-const { LSMALaunchSystem } = require("./MLaunchSystem");
-const instance = require("./INRouter");
-const settings = require("./INCenterServer");
+const { cerr, cinfo } = require("./../ArchLib/LogManagement");
+const { MServerBase } = require("./ServerBase");
+const settings = require("./config.js");
 
 
-const CSMACenterServer = new class CSMACenterServer {
+const MCenterServer = new class MCenterServer {
     constructor() {
         cinfo("Iniciando o CenterServer");
         this.m_strDomain = settings.Domain ?? "localhost";
-        if (!SBMAServerBase.SetDomain(this.m_strDomain)) return cerr("Falha ao definir o domínio");
+        if (!MServerBase.SetDomain(this.m_strDomain)) return cerr("Falha ao definir o domínio");
         if (!this.LoadRouter()) return cerr("Falha ao carregar as rotas");
-        
+
         this.Init();
         cinfo("CenterServer finalizado");
     }
     Init() {
         cinfo("Iniciando Servidor");
-        SBMAServerBase.Listen();
+        MServerBase.Listen();
     }
     LoadRouter() {
-        for (let i in instance) {
-            if (!SBMAServerBase.Sub(i, instance[i].router)) return cerr("Falha ao definir rota");
+        for (let i in settings.routes) {
+            if (!MServerBase.Sub(i, settings.routes[i].router)) return cerr("Falha ao definir rota");
         }
 
         cinfo("Rotas carregadas com sucesso");
@@ -29,4 +27,4 @@ const CSMACenterServer = new class CSMACenterServer {
     };
 };
 
-module.exports = { CSMACenterServer };
+module.exports = { MCenterServer };

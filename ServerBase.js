@@ -1,8 +1,11 @@
-const { cerr, cinfo, clog } = require("../LogManagement/LogManagement");
-const express = require("./../Lib/express");
-const vhost = require("./../Lib/vhost");
+const { cerr, cinfo, clog } = require("./../ArchLib/LogManagement");
+const express = require("./../ArchLib/Common/express");
+const vhost = require("./../ArchLib/Common/vhost");
 
-const SBMAServerBase = new class SBMAServerBase {
+let m_strDomain;
+let m_cbOnline = (err) => { if (err) return cerr("Falha ao conectar o aplicativo"); return cinfo("Servidor online", { domain: m_strDomain }); }
+
+const MServerBase = new class MServerBase {
     constructor() {
         cinfo("Iniciando ServerBase");
         if (!this.Create()) return cerr("Falha ao tentar criar o APP");
@@ -19,7 +22,7 @@ const SBMAServerBase = new class SBMAServerBase {
     }
     Listen() {
         cinfo("Inicializando o aplicativo");
-        this.app.listen(80, (err) => { if (err) return cerr("Falha ao conectar o aplicativo"); cinfo("Servidor online", { domain: this.m_strDomain }); });
+        this.app.listen(80, m_cbOnline);
     }
     Test() {
         cinfo("Teste executado com sucesso");
@@ -32,19 +35,19 @@ const SBMAServerBase = new class SBMAServerBase {
         return true;
     }
     Sub(strSubDomain, Router) {
-        if (!this.m_strDomain) return cerr("O domínio não foi definido");
+        if (!m_strDomain) return cerr("O domínio não foi definido");
 
-        this.app.use(vhost(`${strSubDomain}.${this.m_strDomain}`, Router));
+        this.app.use(vhost(`${strSubDomain}.${m_strDomain}`, Router));
 
         cinfo(`Subdomínio (${strSubDomain}) adicionado com sucesso!`);
         return true;
     };
     SetDomain(strDomain) {
-        this.m_strDomain = strDomain;
+        m_strDomain = strDomain;
 
         cinfo("Domínio definido com sucesso");
         return true;
     };
 };
 
-module.exports = { SBMAServerBase };
+module.exports = { MServerBase };
