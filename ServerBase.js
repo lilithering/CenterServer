@@ -1,3 +1,11 @@
+/*****************************
+Base Server
+Aplicativo Base para Gateway
+Author: Lilithering (lilithering@gmail.com)
+Update: 23-11-20
+[Output] A::BaseServer
+******************************/
+
 const { cerr, cinfo, clog } = require("./../ArchLib/LogManagement");
 const express = require("./../ArchLib/Common/express");
 const vhost = require("./../ArchLib/Common/vhost");
@@ -5,39 +13,29 @@ const vhost = require("./../ArchLib/Common/vhost");
 let m_strDomain;
 let m_cbOnline = (err) => { if (err) return cerr("Falha ao conectar o aplicativo"); return cinfo("Servidor online", { domain: m_strDomain }); }
 
-const MServerBase = new class MServerBase {
+const ABaseServer = new class ABaseServer {
     constructor() {
-        cinfo("Iniciando ServerBase");
-        if (!this.Create()) return cerr("Falha ao tentar criar o APP");
-
-        cinfo("ServerBase iniciado com sucesso");
+        cinfo("Iniciando servidor base");
+        cinfo("Criando aplicativo")
+        this.App = express();
+        cinfo("Servidor base iniciado com sucesso");
     }
     Define() {
-        this.app.get("/", (req, res) => {
+        this.App.get("/", (req, res) => {
             res.send("online");
         });
 
-        cinfo("Definição concluída");
+        cinfo("Rota definida com sucesso");
         return true;
     }
     Listen() {
-        cinfo("Inicializando o aplicativo");
-        this.app.listen(80, m_cbOnline);
-    }
-    Test() {
-        cinfo("Teste executado com sucesso");
-        return true;
-    }
-    Create() {
-        this.app = express();
-
-        cinfo("O app foi criado");
-        return true;
+        this.App.listen(80, m_cbOnline);
     }
     Sub(strSubDomain, Router) {
         if (!m_strDomain) return cerr("O domínio não foi definido");
+        if (!Router) return cerr("Rota inválida", { strSubDomain, Router });
 
-        this.app.use(vhost(`${strSubDomain}.${m_strDomain}`, Router));
+        this.App.use(vhost(`${strSubDomain}.${m_strDomain}`, Router));
 
         cinfo(`Subdomínio (${strSubDomain}) adicionado com sucesso!`);
         return true;
@@ -50,4 +48,4 @@ const MServerBase = new class MServerBase {
     };
 };
 
-module.exports = { MServerBase };
+module.exports = { ABaseServer };
