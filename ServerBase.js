@@ -18,7 +18,6 @@ const ABaseServer = new class ABaseServer {
         cinfo("Iniciando servidor base");
         cinfo("Criando aplicativo")
         this.App = express();
-        cinfo("Servidor base iniciado com sucesso");
     }
     Define() {
         this.App.get("/", (req, res) => {
